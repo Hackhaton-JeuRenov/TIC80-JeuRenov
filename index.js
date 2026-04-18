@@ -1,7 +1,6 @@
 // title:  Tower Defense Prairie - Renovation
 // script: js
 
-<<<<<<< HEAD
 let player = {
 	x: 90,
 	y: 90,
@@ -10,15 +9,6 @@ let player = {
 	moving: false,
 	argent: 100,
 };
-=======
-let x = 96;
-let y = 24;
-let player = { x: 90, y: 90, speed: 1 };
-let tree = { x: 60, y: 60, event: () => print('Voulez-vous ajouter une fenêtre ?') };
-let rock = { x: 80, y: 80, event: () => print('Voulez-vous rénover le toit ?') };
-
-const colliders = [tree, rock];
->>>>>>> 982ee0f ([ADD] event on collider functions)
 
 // On définit les objets avec une fonction d'interaction
 let tree = {
@@ -60,14 +50,9 @@ function isBlocking(a, b) {
 	return a.x < b.x + 8 && a.x + 16 > b.x && a.y < b.y + 8 && a.y + 16 > b.y;
 }
 
-<<<<<<< HEAD
 function isNear(a, b) {
 	let gap = 1;
 	return a.x < b.x + 8 + gap && a.x + 16 > b.x - gap && a.y < b.y + 8 + gap && a.y + 16 > b.y - gap;
-=======
-function collidesAny(p, colliders) {
-	return colliders.some((c) => collision(p, c));
->>>>>>> 982ee0f ([ADD] event on collider functions)
 }
 
 function TIC() {
@@ -99,17 +84,9 @@ function TIC() {
 
 	// 2. COLLISION & MOUVEMENT
 	let next = { x: player.x + dx, y: player.y + dy };
-<<<<<<< HEAD
 	let hit = false;
 	for (let c of colliders) if (isBlocking(next, c)) hit = true;
 	if (!hit) {
-=======
-	if (collidesAny(next, colliders)) {
-		colliders.forEach((c) => {
-			if (collision(next, c) && c.event) c.event();
-		});
-	} else {
->>>>>>> 982ee0f ([ADD] event on collider functions)
 		player.x = next.x;
 		player.y = next.y;
 	}
