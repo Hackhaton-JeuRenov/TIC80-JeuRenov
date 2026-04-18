@@ -16,6 +16,6 @@ function TIC() {
 
 	cls(13);
 	spr(1 + (((t % 60) / 30) | 0) * 2, x, y, 14, 3, 0, 0, 2, 2);
-	print('CACA ' + world, 84, 84);
+	print('CACA2 ' + world, 84, 84);
 	t++;
 }
