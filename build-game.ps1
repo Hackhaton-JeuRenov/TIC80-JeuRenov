@@ -11,8 +11,11 @@ Set-Location $ProjectDir
 $requiredFiles = @(
     "reference.tic",
     "index.js",
-    "tiles_winter.png"
+    "tiles_spring.png",
+    "tiles_winter.png",
+    "sprites.png"
 )
+
 
 foreach ($file in $requiredFiles) {
     if (-not (Test-Path (Join-Path $ProjectDir $file))) {
@@ -43,7 +46,7 @@ $step1 = "load reference.tic & import code copybank.js & run & save reference.ti
 & $Tic80Exe --fs $ProjectDir --cmd $step1
 
 Write-Host "STEP 2 - import des tiles hiver dans la bank 1 + vrai code..."
-$step2 = "load reference.tic & import tiles tiles_winter.png bank=1 & import code index.js & save reference.tic & run"
+$step2 = "load reference.tic & import tiles tiles_spring.png bank=0 & import tiles tiles_winter.png bank=1 & import code index.js & save reference.tic & run"
 & $Tic80Exe --fs $ProjectDir --cmd $step2
 
 # Nettoyage après fermeture du jeu
