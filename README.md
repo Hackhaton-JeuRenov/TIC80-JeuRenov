@@ -1,29 +1,6 @@
 ## Super readme
 
-LANCER LE PROJET
-
-
+LANCER LE PROJET :
 ```
-load reference.tic
-```
-```
-import code copybank.js
-```
-```
-run
-```
-```
-save reference.tic
-```
-```
-import tiles tiles_winter.png bank=1
-```
-```
-save reference.tic
-```
-```
-import code index.js
-```
-```
-run
+.\build-game.ps1
 ```

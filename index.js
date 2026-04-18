@@ -15,6 +15,14 @@ let player = {
 let season = 'printemps';
 let winterLoaded = false;
 let windowsRenovated = false;
+let windowsBrokenBySpring = false;
+const SPRING_WINDOW_BREAK_DELAY_MS = 3000;
+let nextSpringEventAt = SPRING_WINDOW_BREAK_DELAY_MS;
+let eventText = "";
+let eventTextUntil = 0;
+
+let brokenWin1 = 56;
+let brokenWin2 = 99;
 
 // --- VIE ---
 let hp = 100;
@@ -26,12 +34,14 @@ let fullHpUntil = 0;
 
 // --- INTERACTIONS ---
 const INTERACTIVES = {
+	[brokenWin1]: { type: 'fenetre', cost: 50, label: "REPARER FENETRES" },
+	[brokenWin2]: { type: 'fenetre', cost: 50, label: "REPARER FENETRES" },
 	39: { type: 'fenetre', cost: 50, label: "RENOVER FENETRES" },
 	84: { type: 'fenetre', cost: 50, label: "RENOVER FENETRES" },
 	101: { type: 'porte', label: "SORTIR" }
 };
 
-const REPAIRS = { 39: 100, 84: 99 };
+const REPAIRS = { [brokenWin1]: 100, [brokenWin2]: 99 };
 const SOLIDS = [7, 22, 38];
 const PASSABLE = [101];
 
@@ -55,6 +65,30 @@ function switchToWinter() {
 	winterLoaded = true;
 	season = 'hiver';
 	applyPersistentMapChanges();
+}
+
+function showEvent(text, duration = 3000) {
+	eventText = text;
+	eventTextUntil = time() + duration;
+}
+
+function breakWindowsFromSpringEvent() {
+
+	mset(12, 5, brokenWin1);
+	mset(16, 5, brokenWin1);
+	mset(12, 13, brokenWin2);
+	mset(17, 13, brokenWin2);
+	windowsRenovated = false;
+	windowsBrokenBySpring = true;
+	refreshColliders();
+	showEvent("Un voisin a cassé la fenêtre !");
+}
+
+function handleSpringEvents() {
+	if (season !== 'printemps') return;
+	if (windowsBrokenBySpring) return;
+	if (time() < nextSpringEventAt) return;
+	breakWindowsFromSpringEvent();
 }
 
 // --- SCAN COLLISIONS ---
@@ -94,15 +128,14 @@ function isTouching(rect1, rect2, padding = 6) {
 
 // --- ACTIONS ---
 function repairAll() {
-	for (let y = 0; y < 17; y++) {
-		for (let x = 0; x < 30; x++) {
-			let id = mget(x, y);
-			if (REPAIRS[id]) {
-				mset(x, y, REPAIRS[id]);
-			}
-		}
-	}
+	// Repare toujours les 4 fenetres de la maison.
+	mset(12, 5, 39);
+	mset(16, 5, 39);
+	mset(12, 13, 100);
+	mset(17, 13, 100);
 	windowsRenovated = true;
+	windowsBrokenBySpring = false;
+	nextSpringEventAt = time() + SPRING_WINDOW_BREAK_DELAY_MS;
 }
 
 function doAction(obj) {
@@ -176,6 +209,7 @@ function TIC() {
 
 	cls();
 	map(0, 0, 30, 17, 0, 0);
+	handleSpringEvents();
 
 	// --- MOUVEMENT ---
 	let dx = 0;
@@ -237,4 +271,8 @@ function TIC() {
 	// --- HUD ---
 	handle_health();
 	print(`ARGENT: ${player.argent}$`, 170, 2, 0);
+
+	if (time() < eventTextUntil) {
+		print(eventText, 45, 116, 8, false, 1);
+	}
 }
