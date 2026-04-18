@@ -7,12 +7,13 @@ let hp = 100;
 const MAX_HP = 100;
 let prevBtn = {z: false, x: false};
 
-function TIC() {
-    cls(0)
+const KEY_A = 4;
+const KEY_B = 5;
 
+function handle_health(){
     // --- Input ---
-    const btnZ = btn(4); // Z = prendre des dégâts
-    const btnX = btn(5); // X = se soigner
+    const btnZ = btn(KEY_A); // Z = prendre des dégâts
+    const btnX = btn(KEY_B); // X = se soigner
 
     if (btnZ && !prevBtn.z) {
         hp = Math.max(0, hp - 10);
