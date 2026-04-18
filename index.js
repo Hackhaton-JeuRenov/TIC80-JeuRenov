@@ -1,0 +1,21 @@
+// title:  TIC-80 JS Simple Test
+// author: Rob Loach
+// desc:   Small example of using tic80-js
+// script: js
+
+let t = 0;
+let x = 96;
+let y = 24;
+let world = 'WORLD!';
+
+function TIC() {
+	if (btn(0)) y--;
+	if (btn(1)) y++;
+	if (btn(2)) x--;
+	if (btn(3)) x++;
+
+	cls(13);
+	spr(1 + (((t % 60) / 30) | 0) * 2, x, y, 14, 3, 0, 0, 2, 2);
+	print('CACA ' + world, 84, 84);
+	t++;
+}
