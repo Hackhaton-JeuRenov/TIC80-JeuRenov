@@ -31,7 +31,7 @@ const INTERACTIVES = {
 	101: { type: 'porte', label: "SORTIR" }
 };
 
-const REPAIRS = { 39: 100, 84: 99 };
+const REPAIRS = { 100: 84, 39: 55 };
 const SOLIDS = [7, 22, 38];
 const PASSABLE = [101];
 
@@ -41,10 +41,10 @@ let colliders = [];
 function applyPersistentMapChanges() {
 	trace('inApply')
 	if (windowsRenovated) {
-		mset(12, 5, 100);
-		mset(16, 5, 100);
-		mset(12, 13, 99);
-		mset(17, 13, 99);
+		mset(12, 5, 55);
+		mset(16, 5, 55);
+		mset(12, 13, 84);
+		mset(17, 13, 84);
 		trace('inRenovated')
 	}
 }
@@ -226,7 +226,7 @@ function TIC() {
 		bas: player.moving ? (anim ? 257 : 259) : 259,
 		haut: player.moving ? (anim ? 323 : 325) : 327,
 		gauche: player.moving ? (anim ? 297 : 299) : 329,
-		droite: player.moving ? (anim ? 295 : 293) : 331
+		droite: player.moving ? (anim ? 295 : 293) : 365
 	};
 
 	spr(sprites[player.dir], player.x, player.y, 0, 1, 0, 0, 2, 2);
