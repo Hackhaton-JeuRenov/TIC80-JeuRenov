@@ -22,5 +22,8 @@ import tiles tiles_winter.png bank=1
 save reference.tic
 ```
 ```
+import code index.js
+```
+```
 run
 ```
