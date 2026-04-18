@@ -1,141 +1,135 @@
-// title:  Tower Defense Prairie - Renovation
+// title:  Prairie TD - Clean Version
 // script: js
 
+// --- 1. DONNÉES ET CONFIGURATION ---
 let player = {
-	x: 90,
-	y: 90,
-	speed: 1,
-	dir: 'bas',
-	moving: false,
-	argent: 100,
+  x: 117, y: 65,
+  speed: 1, dir: 'bas', moving: false,
+  argent: 100
 };
 
-// On définit les objets avec une fonction d'interaction
-let tree = {
-	x: 60,
-	y: 60,
-	interact: () => {
-		print('COUPE: -10$', 80, 115, 12);
-		if (btnp(4)) {
-			// Touche E
-			if (player.argent >= 10) player.argent -= 10;
-		}
-	},
+// Objets avec lesquels on peut interagir
+const INTERACTIVES = {
+  39: { type: 'fenetre', cost: 50, label: "RENOVER FENETRES" },
+  84: { type: 'fenetre', cost: 50, label: "RENOVER FENETRES" },
+  60: { type: 'arbre',   cost: 10, label: "COUPER L'ARBRE", next: 0 }
 };
 
-let windows = {
-	x: 88, // (012:005 -> 12*8)
-	y: 30, // (5*8)
-	interact: () => {
-		print('RENOVER LA FENETRE (E): 50$', 80, 115, 12);
-		if (keyp(5)) {
-			// btnp = Appui unique sur E
-			if (player.argent >= 50) {
-				player.argent -= 50;
-				// ON CHANGE LE TILE !
-				// mset(tx, ty, id_du_nouveau_tile)
-				mset(12, 5, 100);
-				mset(16, 5, 100);
-				mset(12, 13, 99);
-				mset(17, 13, 99);
-			}
-		}
-	},
-};
+// Remplacement précis (ID sale: ID propre)
+const REPAIRS = { 39: 100, 84: 99 };
 
-const colliders = [tree, windows];
+// Éléments simplement solides (murs, rochers)
+const SOLIDS = [7, 22, 38];
 
-// Fonctions de collision
-function isBlocking(a, b) {
-	return a.x < b.x + 8 && a.x + 16 > b.x && a.y < b.y + 8 && a.y + 16 > b.y;
+let colliders = [];
+
+// --- 2. FONCTIONS OUTILS (MOTEUR) ---
+
+/** Scanne la map pour enregistrer les zones de collision */
+function refreshColliders() {
+  colliders = [];
+  for (let y = 0; y < 17; y++) {
+    for (let x = 0; x < 30; x++) {// scan toute la map
+      let id = mget(x, y);// on vérifie l'ID de la tile à cette position
+      
+      let isAction = INTERACTIVES[id]; // vérifie si c'est une zone d'action
+      let isWall   = SOLIDS.indexOf(id) !== -1; // vérifie si c'est un mur/obstacle
+
+      if (isAction || isWall) {
+        colliders.push({
+          x: x * 8, y: y * 8, tx: x, ty: y,
+          id: id,
+          info: isAction // stocke les infos d'interaction si dispo
+        });
+      }
+    }
+  }
 }
 
-function isNear(a, b) {
-	let gap = 1;
-	return a.x < b.x + 8 + gap && a.x + 16 > b.x - gap && a.y < b.y + 8 + gap && a.y + 16 > b.y - gap;
+/** Vérifie si deux rectangles se touchent */
+function isTouching(rect1, rect2, padding = 6) {
+  return rect1.x + padding < rect2.x + 8 &&
+         rect1.x + 16 - padding > rect2.x &&
+         rect1.y + padding < rect2.y + 8 &&
+         rect1.y + 16 - padding > rect2.y;
 }
+
+// --- 3. ACTIONS DU JEU ---
+
+/** Rénove tous les éléments définis dans REPAIRS */
+function repairAll() {
+  for (let y = 0; y < 17; y++) {
+    for (let x = 0; x < 30; x++) {
+      let id = mget(x, y);
+      if (REPAIRS[id]) mset(x, y, REPAIRS[id]);
+    }
+  }
+}
+
+/** Gère les inputs et l'argent lors d'une interaction */
+function doAction(obj) {
+  let item = obj.info;
+  print(`${item.label} (${item.cost}$)`, 60, 125, 12);
+
+  if (keyp(5) && player.argent >= item.cost) { // Touche E
+    player.argent -= item.cost;
+    sfx(0);
+
+    if (item.type === 'fenetre') repairAll();
+    else mset(obj.tx, obj.ty, item.next);
+
+    refreshColliders();
+  }
+}
+
+// --- 4. BOUCLE TIC-80 ---
+
+refreshColliders();
 
 function TIC() {
-	cls();
-	map(0, 0, 30, 17, 0, 0);
+  cls();
+  map(0, 0, 30, 17, 0, 0);
 
-	let dx = 0,
-		dy = 0;
-	player.moving = false;
+  // -- Mouvement & Direction --
+  let dx = 0, dy = 0;
+  if (btn(0)) { dy = -player.speed; player.dir = 'haut'; }
+  if (btn(1)) { dy = player.speed;  player.dir = 'bas'; }
+  if (btn(2)) { dx = -player.speed; player.dir = 'gauche'; }
+  if (btn(3)) { dx = player.speed;  player.dir = 'droite'; }
+  
+  player.moving = (dx !== 0 || dy !== 0);
 
-	// 1. INPUTS
-	if (btn(0)) {
-		dy -= player.speed;
-		player.dir = 'haut';
-		player.moving = true;
-	} else if (btn(1)) {
-		dy += player.speed;
-		player.dir = 'bas';
-		player.moving = true;
-	} else if (btn(2)) {
-		dx -= player.speed;
-		player.dir = 'gauche';
-		player.moving = true;
-	} else if (btn(3)) {
-		dx += player.speed;
-		player.dir = 'droite';
-		player.moving = true;
-	}
+  // -- Collisions (Glissement sur les axes) --
+  let nextX = { x: player.x + dx, y: player.y };
+  let nextY = { x: player.x, y: player.y + dy };
+  let hitX = false, hitY = false;
+  let activeObj = null;
 
-	// 2. COLLISION & MOUVEMENT
-	let next = { x: player.x + dx, y: player.y + dy };
-	let hit = false;
-	for (let c of colliders) if (isBlocking(next, c)) hit = true;
-	if (!hit) {
-		player.x = next.x;
-		player.y = next.y;
-	}
+  for (let c of colliders) {
+    if (isTouching(nextX, c)) hitX = true;
+    if (isTouching(nextY, c)) hitY = true;
+    // Détection interaction (marge plus large pour être à l'aise)
+    if (c.info && isTouching(player, c, -2)) activeObj = c;
+  }
 
-	// 3. ANIMATION SPRITES
-	let frame = Math.floor(time() / 150) % 2;
-	let spriteId = 259;
-	if (player.dir === 'bas')
-		spriteId =
-			player.moving ?
-				frame == 0 ?
-					257
-				:	259
-			:	259;
-	else if (player.dir === 'haut')
-		spriteId =
-			player.moving ?
-				frame == 0 ?
-					323
-				:	325
-			:	327;
-	else if (player.dir === 'gauche')
-		spriteId =
-			player.moving ?
-				frame == 0 ?
-					297
-				:	299
-			:	329;
-	else if (player.dir === 'droite')
-		spriteId =
-			player.moving ?
-				frame == 0 ?
-					295
-				:	293
-			:	331;
+  if (!hitX) player.x += dx;
+  if (!hitY) player.y += dy;
 
-	// 4. DESSIN DU JOUEUR
-	spr(spriteId, player.x, player.y, 0, 1, 0, 0, 2, 2);
+  // -- Animation du Sprite --
+  let anim = (Math.floor(time() / 150) % 2 === 0);
+  let sprId = 259; // ID par défaut
 
-	// 5. INTERACTION (Touche E)
-	colliders.forEach((c) => {
-		if (isNear(player, c)) {
-			if (c.interact) c.interact();
-		}
-	});
+  const sprites = {
+    bas:    player.moving ? (anim ? 257 : 259) : 259,
+    haut:   player.moving ? (anim ? 323 : 325) : 327,
+    gauche: player.moving ? (anim ? 297 : 299) : 329,
+    droite: player.moving ? (anim ? 295 : 293) : 331
+  };
+  sprId = sprites[player.dir];
 
-	// 6. UI (Argent en haut à droite)
-	print('ARGENT: ' + player.argent + '$', 170, 5, 11);
+  spr(sprId, player.x, player.y, 0, 1, 0, 0, 2, 2);
 
-	// Debug Pos
-	print('X:' + Math.floor(player.x) + ' Y:' + Math.floor(player.y), 5, 5, 12);
+  // -- HUD & UI --
+  if (activeObj) doAction(activeObj);
+  print(`ARGENT: ${player.argent}$`, 170, 5, 11);
 }
