@@ -256,6 +256,7 @@ const TARGETABLE_TILES = {
 let houseHp = 100;
 const HOUSE_MAX_HP = 100;
 let structures = [];
+let windowsBrokenAtMinus30Done = false;
 
 // ======================================================
 // PARAMETRES DE SAISON
@@ -352,6 +353,22 @@ function breakWindowsFromSpringEvent() {
 	refreshStructures();
 }
 
+function breakWindowsAtMinus30Once() {
+	if (windowsBrokenAtMinus30Done) return;
+	if (houseHp > -30) return;
+
+	mset(12, 5, 55);
+	mset(16, 5, 55);
+	mset(12, 13, 99);
+	mset(17, 13, 99);
+
+	windowsBrokenAtMinus30Done = true;
+	windowsRenovated = false;
+
+	refreshColliders();
+	refreshStructures();
+}
+
 function handleSpringWindowEvent() {
 	if (season !== 'printemps') return;
 	if (windowsBrokenBySpring) return;
@@ -442,10 +459,10 @@ function isTouching(rect1, rect2, padding = 6) {
 
 function repairAll() {
 	// Repare explicitement les 4 fenetres
-	mset(12, 5, 100);
-	mset(16, 5, 100);
-	mset(12, 13, 99);
-	mset(17, 13, 99);
+	mset(12, 5, 39);
+	mset(16, 5, 39);
+	mset(12, 13, 100);
+	mset(17, 13, 100);
 
 	windowsRenovated = true;
 	windowsBrokenBySpring = false;
@@ -464,7 +481,6 @@ function doAction(obj) {
 
 	if (item.type === 'fenetre' && keyp(KEY_B) && player.argent >= item.cost) {
 		player.argent -= item.cost;
-		sfx(0);
 		repairAll();
 	}
 }
@@ -561,7 +577,7 @@ function trySpawnEnemy() {
 }
 
 function updateEnemies() {
-	if (houseHp <= 0 || structures.length === 0) return;
+	if (houseHp <= -30 || structures.length === 0) return;
 
 	trySpawnEnemy();
 
@@ -588,8 +604,8 @@ function updateEnemies() {
 				impact = Math.max(impact, HOUSE_HIT_DAMAGE);
 			}
 
-			houseHp = Math.max(0, houseHp - impact);
-			sfx(1);
+			houseHp = houseHp - impact;
+			breakWindowsAtMinus30Once();
 			enemies.splice(i, 1);
 		}
 	}
@@ -632,27 +648,6 @@ function drawHouseHp() {
 
 	if (houseHp <= 0) {
 		print('GAME OVER', 92, 62, 8, false, 2);
-	}
-}
-
-function drawPlayerHp() {
-	const pct = hp / MAX_HP;
-	let col = 11;
-	if (pct <= 0.5) col = 9;
-	if (pct <= 0.25) col = 8;
-
-	rect(2, 10, 40, 4, 1);
-	rectb(2, 10, 40, 4, 6);
-
-	const w = Math.floor(pct * 40);
-	if (w > 0) rect(2, 10, w, 4, col);
-
-	print('HP:' + hp, 44, 10, 0, false, 1);
-
-	if (hp === 0) {
-		print('DEAD!', 100, 70, 8, false, 2);
-	} else if (hp === MAX_HP && time() < fullHpUntil) {
-		print('FULL HP!', 92, 70, 11, false, 2);
 	}
 }
 
@@ -796,7 +791,6 @@ function TIC() {
 	// HUD
 	handleHealthInput();
 	drawHouseHp();
-	drawPlayerHp();
 
 	let remainingSeason = Math.max(0, Math.ceil((SEASON_DURATION_MS - (time() - seasonStartTime)) / 1000));
 	let remainingSpawnDelay = Math.max(0, Math.ceil((ENEMY_SPAWN_DELAY_MS - (time() - seasonStartTime)) / 1000));
