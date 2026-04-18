@@ -1,6 +1,188 @@
 // title: Prairie TD - Merged Version
 // script: js
 
+// --- INTRO ---
+let gameState = 'intro';
+let introStartTime = -1;
+let introScrollOffset = 0;
+
+const INTRO_LINES = [
+	'Welcome.',
+	'',
+	'After years of saving',
+	'(and a few questionable life choices),',
+	'you are finally a homeowner.',
+	'',
+	'The price was... suspiciously low.',
+	'',
+	'The reason? This house has not',
+	'been renovated in decades.',
+	'And outside, the climate is no longer',
+	'playing by the old rules.',
+	'',
+	'Freezing winters, scorching summers,',
+	'violent storms... every season',
+	'is ready to test your decisions.',
+	'',
+	"You can't afford to fix everything.",
+	'Definitely not right now.',
+	'',
+	'So choose wisely.',
+	'',
+	'Because here, every detail matters.',
+	'',
+	'One bad decision...',
+	'and this house will happily',
+	'remind you why it was so cheap.',
+];
+
+const WINTER_LINES = [
+	'Winter is coming.',
+	'',
+	'At first, it feels almost peaceful.',
+	'Quiet. Calm. Suspiciously calm.',
+	'',
+	'Then the storm shows up.',
+	'',
+	'The wind screams at your walls,',
+	'snow stacks up on the roof,',
+	'and the cold slips inside',
+	'like it owns the place.',
+	'',
+	'Every weakness becomes obvious.',
+	'Very obvious.',
+	'',
+	'Every draft feels personal.',
+	'',
+	'This house is not ready.',
+	'',
+	'Hopefully, you are.',
+];
+
+const WINTER1_FAIL = [
+	'The storm arrives in full force.',
+	'',
+	'Snow piles up on the roof.',
+	'More. And more.',
+	'And more.',
+	'',
+	'That sound... was not reassuring.',
+	'',
+	'The roof gives in.',
+	'',
+	'Turns out, fixing it',
+	'was not optional.',
+];
+const WINTER1_SUCCESS = ['The storm hits hard.', '', 'Snow piles up on the roof.', '', 'But this time...', 'it holds.', '', 'For once, something', 'goes according to plan.'];
+const SUMMER1_FAIL = [
+	'The heat arrives early.',
+	'',
+	'Then it stays.',
+	'',
+	'The walls trap the warmth inside.',
+	'',
+	'Every room becomes an oven.',
+	'',
+	'Breathing gets harder.',
+	'Thinking gets slower.',
+	'',
+	'Maybe insulation mattered',
+	'after all.',
+];
+const SUMMER1_SUCCESS = ['The heatwave settles in.', '', 'But inside...', 'it is bearable.', '', 'The walls do their job.', '', 'You are not comfortable.', '', 'But you are alive.'];
+const WINTER2_FAIL = [
+	'Winter returns.',
+	'',
+	'Colder than before.',
+	'',
+	'You turn on the heater.',
+	'',
+	'It clicks.',
+	'',
+	'It stops.',
+	'',
+	'...that is not a good sign.',
+	'',
+	'The cold takes its time.',
+	'',
+	'You do not.',
+];
+const FINAL_FAIL = [
+	'Summer comes back.',
+	'',
+	'Money is gone.',
+	'Completely gone.',
+	'',
+	'The windows are still broken.',
+	'',
+	'At some point,',
+	'you just stop caring.',
+	'',
+	'Fresh air is nice.',
+	'Privacy is overrated.',
+	'',
+	'Your neighbors disagree.',
+	'Very loudly.',
+	'',
+	'Apparently,',
+	'walking around naked',
+	'was the last straw.',
+	'',
+	'Turns out...',
+	'you can survive the weather,',
+	'but not the neighborhood.',
+	'',
+	'And deep down,',
+	'you knew it all along:',
+	'you don’t win',
+	'the renovation game',
+	'when you’re broke.',
+];
+
+let introOnEnd = null;
+
+function startIntroScreen(lines, onEnd) {
+	introScrollOffset = 0;
+	introStartTime = -1;
+	introOnEnd = { lines: lines, cb: onEnd };
+}
+
+function drawIntro() {
+	if (introStartTime < 0) introStartTime = time();
+
+	cls(0);
+
+	const lineH = 9;
+	const elapsed = time() - introStartTime;
+	const lines = introOnEnd ? introOnEnd.lines : INTRO_LINES;
+
+	if (btn(1)) introScrollOffset = Math.min(introScrollOffset + 1.5, lines.length * lineH);
+	if (btn(0)) introScrollOffset = Math.max(introScrollOffset - 1.5, 0);
+
+	for (let i = 0; i < lines.length; i++) {
+		const y = 10 + i * lineH - introScrollOffset;
+		if (y >= -lineH && y <= 136) {
+			const line = lines[i];
+			const x = Math.floor((240 - line.length * 6) / 2);
+			print(line, x, y, 12);
+		}
+	}
+
+	// Prompt clignotant en bas
+	rect(0, 120, 240, 16, 0);
+	if (Math.floor(elapsed / 750) % 2 === 0) {
+		print('UP/DOWN: scroll  ENTER: go next', 36, 126, 6);
+	}
+
+	if (keyp(50)) {
+		const cb = introOnEnd ? introOnEnd.cb : null;
+		introOnEnd = null;
+		if (cb) cb();
+		else gameState = 'game';
+		return;
+	}
+}
+
 // --- JOUEUR ---
 let player = {
 	x: 117,
@@ -8,7 +190,7 @@ let player = {
 	speed: 1,
 	dir: 'bas',
 	moving: false,
-	argent: 100
+	argent: 100,
 };
 
 // --- SAISON / MAP ---
@@ -26,9 +208,9 @@ let fullHpUntil = 0;
 
 // --- INTERACTIONS ---
 const INTERACTIVES = {
-	39: { type: 'fenetre', cost: 50, label: "RENOVER FENETRES" },
-	84: { type: 'fenetre', cost: 50, label: "RENOVER FENETRES" },
-	101: { type: 'porte', label: "SORTIR" }
+	39: { type: 'fenetre', cost: 50, label: 'RENOVER FENETRES' },
+	84: { type: 'fenetre', cost: 50, label: 'RENOVER FENETRES' },
+	101: { type: 'porte', label: 'SORTIR' },
 };
 
 const REPAIRS = { 39: 100, 84: 99 };
@@ -39,18 +221,18 @@ let colliders = [];
 
 // --- OUTILS MAP / SAISON ---
 function applyPersistentMapChanges() {
-	trace('inApply')
+	trace('inApply');
 	if (windowsRenovated) {
 		mset(12, 5, 100);
 		mset(16, 5, 100);
 		mset(12, 13, 99);
 		mset(17, 13, 99);
-		trace('inRenovated')
+		trace('inRenovated');
 	}
 }
 
 function switchToWinter() {
-	trace("switchToWinter()", 12);
+	trace('switchToWinter()', 12);
 	sync(0, 1, false);
 	winterLoaded = true;
 	season = 'hiver';
@@ -77,7 +259,7 @@ function refreshColliders() {
 					tx: x,
 					ty: y,
 					id: id,
-					info: isAction || null
+					info: isAction || null,
 				});
 			}
 		}
@@ -86,10 +268,7 @@ function refreshColliders() {
 
 // --- COLLISION RECTANGLE ---
 function isTouching(rect1, rect2, padding = 6) {
-	return rect1.x + padding < rect2.x + 8 &&
-		rect1.x + 16 - padding > rect2.x &&
-		rect1.y + padding < rect2.y + 8 &&
-		rect1.y + 16 - padding > rect2.y;
+	return rect1.x + padding < rect2.x + 8 && rect1.x + 16 - padding > rect2.x && rect1.y + padding < rect2.y + 8 && rect1.y + 16 - padding > rect2.y;
 }
 
 // --- ACTIONS ---
@@ -155,12 +334,12 @@ function handle_health() {
 	const w = Math.floor(pct * 40);
 	if (w > 0) rect(2, 2, w, 4, col);
 
-	print("HP:" + hp, 44, 2, 0, false, 1);
+	print('HP:' + hp, 44, 2, 0, false, 1);
 
 	if (hp === 0) {
-		print("DEAD!", 100, 62, 0, false, 2);
+		print('DEAD!', 100, 62, 0, false, 2);
 	} else if (hp === MAX_HP && time() < fullHpUntil) {
-		print("FULL HP!", 92, 62, 0, false, 2);
+		print('FULL HP!', 92, 62, 0, false, 2);
 	}
 }
 
@@ -169,9 +348,18 @@ refreshColliders();
 
 // --- BOUCLE PRINCIPALE ---
 function TIC() {
+	if (gameState === 'intro' || gameState === 'season_intro') {
+		drawIntro();
+		return;
+	}
+
 	// Changement saison manuel
 	if (!winterLoaded && btnp(7)) {
-		switchToWinter();
+		gameState = 'season_intro';
+		startIntroScreen(WINTER_LINES, () => {
+			switchToWinter();
+			gameState = 'game';
+		});
 	}
 
 	cls();
@@ -198,7 +386,7 @@ function TIC() {
 		player.dir = 'droite';
 	}
 
-	player.moving = (dx !== 0 || dy !== 0);
+	player.moving = dx !== 0 || dy !== 0;
 
 	// --- COLLISIONS ---
 	let nextX = { x: player.x + dx, y: player.y };
@@ -220,13 +408,29 @@ function TIC() {
 	if (!hitY) player.y += dy;
 
 	// --- SPRITE ---
-	let anim = (Math.floor(time() / 150) % 2 === 0);
+	let anim = Math.floor(time() / 150) % 2 === 0;
 
 	const sprites = {
-		bas: player.moving ? (anim ? 257 : 259) : 259,
-		haut: player.moving ? (anim ? 323 : 325) : 327,
-		gauche: player.moving ? (anim ? 297 : 299) : 329,
-		droite: player.moving ? (anim ? 295 : 293) : 331
+		bas:
+			player.moving ?
+				anim ? 257
+				:	259
+			:	259,
+		haut:
+			player.moving ?
+				anim ? 323
+				:	325
+			:	327,
+		gauche:
+			player.moving ?
+				anim ? 297
+				:	299
+			:	329,
+		droite:
+			player.moving ?
+				anim ? 295
+				:	293
+			:	331,
 	};
 
 	spr(sprites[player.dir], player.x, player.y, 0, 1, 0, 0, 2, 2);
