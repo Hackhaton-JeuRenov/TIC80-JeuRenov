@@ -1,4 +1,4 @@
-// title: Prairie TD - Merged Version
+﻿// title: Prairie TD - Renovation Demo
 // script: js
 
 // ======================================================
@@ -11,137 +11,92 @@ let introScrollOffset = 0;
 let introOnEnd = null;
 
 const INTRO_LINES = [
-	'Welcome.',
+	'Bienvenue.',
 	'',
-	'After years of saving',
-	'(and a few questionable life choices),',
-	'you are finally a homeowner.',
+	'Tu viens d\'acheter une maison.',
+	'Le prix etait tres bas.',
 	'',
-	'The price was... suspiciously low.',
+	'La raison est simple:',
+	'la maison est en mauvais etat,',
+	'et les saisons sont devenues extremes.',
 	'',
-	'The reason? This house has not',
-	'been renovated in decades.',
-	'And outside, the climate is no longer',
-	'playing by the old rules.',
+	'Tu ne peux pas tout renover tout de suite.',
+	'Il faudra choisir les bons travaux.',
 	'',
-	'Freezing winters, scorching summers,',
-	'violent storms... every season',
-	'is ready to test your decisions.',
-	'',
-	"You cannot afford to fix everything.",
-	'Definitely not right now.',
-	'',
-	'So choose wisely.',
-	'',
-	'Because here, every detail matters.',
-	'',
-	'One bad decision...',
-	'and this house will happily',
-	'remind you why it was so cheap.'
+	'Objectif de la demo:',
+	'- Se deplacer',
+	'- Renover',
+	'- Passer les saisons',
+	'- Survivre'
 ];
 
-const WINTER_LINES = [
-	'Winter is coming.',
+const WINTER1_LINES = [
+	'Hiver 1 arrive.',
 	'',
-	'At first, it feels almost peaceful.',
-	'Quiet. Calm. Suspiciously calm.',
+	'Mega neige annoncee.',
 	'',
-	'Then the storm shows up.',
-	'',
-	'The wind screams at your walls,',
-	'snow stacks up on the roof,',
-	'and the cold slips inside',
-	'like it owns the place.',
-	'',
-	'Every weakness becomes obvious.',
-	'Very obvious.',
-	'',
-	'Every draft feels personal.',
-	'',
-	'This house is not ready.',
-	'',
-	'Hopefully, you are.'
+	'Si le toit n\'est pas renove:',
+	'effondrement immediat.'
 ];
 
-// Conserves narrative content from the first version
-const WINTER1_FAIL = [
-	'The storm arrives in full force.',
+const INTERSEASON_LINES = [
+	'Inter-saison.',
 	'',
-	'Snow piles up on the roof.',
-	'More. And more.',
-	'And more.',
+	'La tempete est passee.',
 	'',
-	'That sound... was not reassuring.',
-	'',
-	'The roof gives in.',
-	'',
-	'Turns out, fixing it',
-	'was not optional.'
+	'Tu peux retravailler',
+	'et finir des renovations',
+	'avant le prochain hiver.'
 ];
-const WINTER1_SUCCESS = ['The storm hits hard.', '', 'Snow piles up on the roof.', '', 'But this time...', 'it holds.', '', 'For once, something', 'goes according to plan.'];
-const SUMMER1_FAIL = [
-	'The heat arrives early.',
+
+const WINTER2_LINES = [
+	'Hiver 2 arrive.',
 	'',
-	'Then it stays.',
+	'Anomalies climatiques:',
+	'- Vague de chaleur',
+	'- Retour du gel',
 	'',
-	'The walls trap the warmth inside.',
-	'',
-	'Every room becomes an oven.',
-	'',
-	'Breathing gets harder.',
-	'Thinking gets slower.',
-	'',
-	'Maybe insulation mattered',
-	'after all.'
+	'La maison doit tenir.'
 ];
-const SUMMER1_SUCCESS = ['The heatwave settles in.', '', 'But inside...', 'it is bearable.', '', 'The walls do their job.', '', 'You are not comfortable.', '', 'But you are alive.'];
-const WINTER2_FAIL = [
-	'Winter returns.',
+
+const WINTER1_FAIL_LINES = [
+	'Mega neige.',
+	'Le toit cede.',
 	'',
-	'Colder than before.',
-	'',
-	'You turn on the heater.',
-	'',
-	'It clicks.',
-	'',
-	'It stops.',
-	'',
-	'...that is not a good sign.',
-	'',
-	'The cold takes its time.',
-	'',
-	'You do not.'
+	'GAME OVER',
+	'Toit non renove.'
 ];
-const FINAL_FAIL = [
-	'Summer comes back.',
+
+const HEAT_FAIL_LINES = [
+	'Anomalie: vague de chaleur.',
+	'La maison est mal isolee.',
 	'',
-	'Money is gone.',
-	'Completely gone.',
+	'GAME OVER',
+	'Secheresse / chaleur.'
+];
+
+const BOILER_FAIL_LINES = [
+	'Anomalie: retour du froid.',
+	'La chaudiere tombe en panne.',
 	'',
-	'The windows are still broken.',
+	'GAME OVER',
+	'Gel de la maison.'
+];
+
+const HOUSE_FAIL_LINES = [
+	'La maison a trop subi.',
+	'Structure detruite.',
 	'',
-	'At some point,',
-	'you just stop caring.',
+	'GAME OVER'
+];
+
+const VICTORY_LINES = [
+	'Les saisons extremes sont passees.',
 	'',
-	'Fresh air is nice.',
-	'Privacy is overrated.',
+	'La maison tient bon.',
 	'',
-	'Your neighbors disagree.',
-	'Very loudly.',
-	'',
-	'Apparently,',
-	'walking around naked',
-	'was the last straw.',
-	'',
-	'Turns out...',
-	'you can survive the weather,',
-	'but not the neighborhood.',
-	'',
-	'And deep down,',
-	'you knew it all along:',
-	'you do not win',
-	'the renovation game',
-	'when you are broke.'
+	'VICTOIRE',
+	'Prototype de renovation valide.'
 ];
 
 function startIntroScreen(lines, onEnd) {
@@ -173,7 +128,7 @@ function drawIntro() {
 
 	rect(0, 120, 240, 16, 0);
 	if (Math.floor(elapsed / 750) % 2 === 0) {
-		print('UP/DOWN: scroll  ENTER: go next', 36, 126, 6);
+		print('FLECHES H/B: defiler  ENTREE: continuer', 16, 126, 6);
 	}
 
 	if (keyp(50)) {
@@ -181,6 +136,31 @@ function drawIntro() {
 		introOnEnd = null;
 		if (cb) cb();
 		else gameState = 'game';
+	}
+}
+
+function drawGameOverScreen() {
+	cls(0);
+
+	// Ecriture GAME OVER (sprite demande: id 452)
+	spr(GAMEOVER_TEXT_SPRITE_ID, 108, 34, 0, 1, 0, 0, 3, 1);
+	print('GAME OVER', 72, 22, 8, false, 2);
+
+	// Joueur couche sur fond noir
+	spr(GAMEOVER_PLAYER_LYING_SPRITE_ID, 104, 64, 0, 1, 0, 0, 2, 2);
+
+	// Message de cause court (optionnel)
+	if (gameOverReasonLines.length > 0) {
+		print(gameOverReasonLines[0], 6, 106, 6);
+	}
+
+	if (Math.floor((time() - gameOverStartTime) / 600) % 2 === 0) {
+		print('ENTREE: recommencer', 72, 122, 12);
+	}
+
+	if (keyp(50)) {
+		resetRun();
+		gameState = 'game';
 	}
 }
 
@@ -194,15 +174,37 @@ const TILE = 8;
 const SCREEN_W = 240;
 const SCREEN_H = 136;
 
+// TIC-80 gamepad: A=4, B=5 (sur clavier AZERTY: Z et X)
 const KEY_A = 4;
 const KEY_B = 5;
+const KEYBOARD_X = 24;
+const KEYBOARD_Z = 26;
 
-const SEASON_DURATION_MS = 10000;
-const ENEMY_SPAWN_DELAY_MS = 3000;
-const SPRING_WINDOW_BREAK_DELAY_MS = 10000;
+const PHASE = {
+	ETE1: 'ete1',
+	HIVER1: 'hiver1',
+	INTERSAISON: 'intersaison',
+	HIVER2: 'hiver2'
+};
+
+const PHASE_LABELS = {
+	ete1: 'ETE 1',
+	hiver1: 'HIVER 1',
+	intersaison: 'INTERSAISON',
+	hiver2: 'HIVER 2'
+};
+
+const PHASE_DURATION_MS = 30000;
+const WINTER1_CHECK_DELAY_MS = PHASE_DURATION_MS;
+const WINTER2_HEAT_DELAY_MS = 2800;
+const WINTER2_BOILER_DELAY_MS = 6000;
+const RENOVATION_HEAL_HP = 10;
+const WINTER1_EVENT_DAMAGE = 10;
+const WINTER2_HEAT_EVENT_DAMAGE = 12;
+const WINTER2_BOILER_EVENT_DAMAGE = 10;
 
 // ======================================================
-// JOUEUR / SAISON
+// JOUEUR / SAISON / PHASES
 // ======================================================
 
 let player = {
@@ -218,67 +220,110 @@ let season = 'printemps';
 let seasonStartTime = 0;
 let winterLoaded = false;
 let winterTransitionQueued = false;
-let windowsRenovated = false;
-let windowsBrokenBySpring = false;
-let nextSpringWindowBreakAt = SPRING_WINDOW_BREAK_DELAY_MS;
+
+let phase = PHASE.ETE1;
+let phaseStartTime = 0;
+let queuedPhase = null;
+let queuedPhaseAt = 0;
+
+let didWinter1Check = false;
+let didWinter2HeatCheck = false;
+let didWinter2BoilerCheck = false;
+
+let workCollectedInPhase = false;
+
+let interactionMessage = '';
+let interactionColor = 12;
+let eventMessage = '';
+let eventColor = 12;
+let eventUntil = 0;
+let gameOverReasonLines = [];
+let gameOverStartTime = 0;
+
+const GAMEOVER_TEXT_SPRITE_ID = 452;
+const GAMEOVER_PLAYER_LYING_SPRITE_ID = 452;
 
 // ======================================================
-// VIE JOUEUR
-// ======================================================
-
-let hp = 100;
-const MAX_HP = 100;
-let prevBtn = { z: false, x: false };
-let fullHpUntil = 0;
-
-// ======================================================
-// MAISON / STRUCTURES
+// MAISON / RENOVATIONS
 // ======================================================
 
 const HOUSE_TILE_ID = 31;
-const HOUSE_HIT_DAMAGE = 10;
+const HOUSE_HIT_DAMAGE = 8;
+const HOUSE_MAX_HP = 100;
+let houseHp = HOUSE_MAX_HP;
+
+const renovationDefs = {
+	windows: {
+		label: 'FENETRES',
+		cost: 50,
+		description: 'Isolation des fenetres',
+		failNote: 'Risque chaleur en hiver2'
+	},
+	boiler: {
+		label: 'CHAUDIERE',
+		cost: 50,
+		description: 'Evite la panne de chauffage',
+		failNote: 'Panne + gel en hiver2'
+	},
+	roof: {
+		label: 'TOIT',
+		cost: 90,
+		description: 'Supporte la mega neige',
+		failNote: 'Effondrement en hiver1'
+	},
+	wall: {
+		label: 'MUR',
+		cost: 90,
+		description: 'Isolation thermique',
+		failNote: 'Risque chaleur en hiver2'
+	}
+};
+
+let renovations = {
+	windows: false,
+	boiler: false,
+	roof: false,
+	wall: false
+};
+
+const WINDOW_TILES = [
+	{ tx: 12, ty: 5, broken: 39, repaired: 100 },
+	{ tx: 16, ty: 5, broken: 39, repaired: 100 },
+	{ tx: 12, ty: 13, broken: 84, repaired: 99 },
+	{ tx: 17, ty: 13, broken: 84, repaired: 99 }
+];
+
+const RENOVATION_ZONES = {
+	roof: { x: 112, y: 20, w: 16, h: 16 },
+	wall: { x: 112, y: 72, w: 16, h: 16 },
+	boiler: { x: 149, y: 89, w: 16, h: 16 }
+};
+
+// Marqueurs 8x8 pour les zones de renovation (sans rectangles).
+// Tu peux ajuster `boiler` si tu veux un autre sprite 8x8 de ta sheet.
+const RENOVATION_ZONE_ICONS = {
+	roof: 31,
+	wall: 38,
+	boiler: 0
+};
+
+// ======================================================
+// STRUCTURES CIBLABLES (pression visuelle simple)
+// ======================================================
 
 const TARGETABLE_TILES = {
 	7: { type: 'mur', damageFactor: 0.35, targetBias: 1 },
 	22: { type: 'mur', damageFactor: 0.35, targetBias: 1 },
 	38: { type: 'mur', damageFactor: 0.35, targetBias: 1 },
-
 	39: { type: 'fenetre_cassee', damageFactor: 0.60, targetBias: 2 },
 	84: { type: 'fenetre_cassee', damageFactor: 0.60, targetBias: 2 },
-
-	100: { type: 'fenetre_reparee', damageFactor: 0.30, targetBias: 2 },
-	99: { type: 'fenetre_reparee', damageFactor: 0.30, targetBias: 2 },
-
-	101: { type: 'porte', damageFactor: 0.85, targetBias: 3 },
-	31: { type: 'maison', damageFactor: 1.15, targetBias: 4 }
+	100: { type: 'fenetre_reparee', damageFactor: 0.25, targetBias: 2 },
+	99: { type: 'fenetre_reparee', damageFactor: 0.25, targetBias: 2 },
+	101: { type: 'porte', damageFactor: 0.80, targetBias: 3 },
+	31: { type: 'maison', damageFactor: 1.10, targetBias: 4 }
 };
 
-let houseHp = 100;
-const HOUSE_MAX_HP = 100;
 let structures = [];
-let windowsBrokenAtMinus30Done = false;
-
-// ======================================================
-// PARAMETRES DE SAISON
-// ======================================================
-
-const SEASON_SETTINGS = {
-	printemps: {
-		spawnDelay: 2200,
-		maxTotalSpawns: 10,
-		maxAlive: 3
-	},
-	hiver: {
-		spawnDelay: 1400,
-		maxTotalSpawns: 16,
-		maxAlive: 5
-	}
-};
-
-let spawnedBySeason = {
-	printemps: 0,
-	hiver: 0
-};
 
 // ======================================================
 // INTERACTIONS / COLLISIONS
@@ -287,7 +332,7 @@ let spawnedBySeason = {
 const INTERACTIVES = {
 	39: { type: 'fenetre', cost: 50, label: 'RENOVER FENETRES' },
 	84: { type: 'fenetre', cost: 50, label: 'RENOVER FENETRES' },
-	101: { type: 'porte', label: 'SORTIR' }
+	101: { type: 'porte', label: 'PORTE (TRAVERSABLE)' }
 };
 
 const SOLIDS = [7, 22, 38, 99, 100, 31];
@@ -296,11 +341,29 @@ const PASSABLE = [101];
 let colliders = [];
 
 // ======================================================
-// ENNEMIS
+// ENNEMIS (garde simple, secondaire)
 // ======================================================
 
 let enemies = [];
 let lastSpawn = 0;
+
+const SEASON_SETTINGS = {
+	printemps: {
+		spawnDelay: 2600,
+		maxTotalSpawns: 8,
+		maxAlive: 2
+	},
+	hiver: {
+		spawnDelay: 1500,
+		maxTotalSpawns: 14,
+		maxAlive: 4
+	}
+};
+
+let spawnedBySeason = {
+	printemps: 0,
+	hiver: 0
+};
 
 const ENEMY_TYPES = {
 	coureur: {
@@ -308,10 +371,10 @@ const ENEMY_TYPES = {
 		w: 16,
 		h: 16,
 		baseSpeed: 0.55,
-		baseDamage: 8,
+		baseDamage: 12,
 		seasonMods: {
-			printemps: { speedMul: 0.85, damageMul: 0.85 },
-			hiver: { speedMul: 1.35, damageMul: 1.30 }
+			printemps: { speedMul: 0.80, damageMul: 0.75 },
+			hiver: { speedMul: 1.35, damageMul: 1.20 }
 		}
 	},
 	brute: {
@@ -319,12 +382,20 @@ const ENEMY_TYPES = {
 		w: 16,
 		h: 16,
 		baseSpeed: 0.40,
-		baseDamage: 12,
+		baseDamage: 18,
 		seasonMods: {
-			printemps: { speedMul: 1.25, damageMul: 1.20 },
-			hiver: { speedMul: 0.80, damageMul: 0.85 }
+			printemps: { speedMul: 1.15, damageMul: 1.00 },
+			hiver: { speedMul: 0.90, damageMul: 0.95 }
 		}
 	}
+};
+
+// Sprites saisonniers des "voisins"/PNJ menacants:
+// - ete (map printemps): feu
+// - hiver: tornade
+const SEASON_THREAT_SPRITES = {
+	printemps: 457,
+	hiver: 331
 };
 
 // ======================================================
@@ -332,55 +403,27 @@ const ENEMY_TYPES = {
 // ======================================================
 
 function applyPersistentMapChanges() {
-	if (windowsRenovated) {
-		mset(12, 5, 100);
-		mset(16, 5, 100);
-		mset(12, 13, 99);
-		mset(17, 13, 99);
+	for (let i = 0; i < WINDOW_TILES.length; i++) {
+		let w = WINDOW_TILES[i];
+		mset(w.tx, w.ty, renovations.windows ? w.repaired : w.broken);
 	}
-}
-
-function breakWindowsFromSpringEvent() {
-	mset(12, 5, 39);
-	mset(16, 5, 39);
-	mset(12, 13, 84);
-	mset(17, 13, 84);
-
-	windowsRenovated = false;
-	windowsBrokenBySpring = true;
-
-	refreshColliders();
-	refreshStructures();
-}
-
-function breakWindowsAtMinus30Once() {
-	if (windowsBrokenAtMinus30Done) return;
-	if (houseHp > -30) return;
-
-	mset(12, 5, 55);
-	mset(16, 5, 55);
-	mset(12, 13, 99);
-	mset(17, 13, 99);
-
-	windowsBrokenAtMinus30Done = true;
-	windowsRenovated = false;
-
-	refreshColliders();
-	refreshStructures();
-}
-
-function handleSpringWindowEvent() {
-	if (season !== 'printemps') return;
-	if (windowsBrokenBySpring) return;
-	if (time() < nextSpringWindowBreakAt) return;
-
-	breakWindowsFromSpringEvent();
 }
 
 function switchToWinter() {
 	sync(0, 1, false);
 	winterLoaded = true;
 	season = 'hiver';
+	seasonStartTime = time();
+	lastSpawn = time();
+	applyPersistentMapChanges();
+	refreshColliders();
+	refreshStructures();
+}
+
+function switchToSummer() {
+	sync(0, 0, false);
+	winterLoaded = false;
+	season = 'printemps';
 	seasonStartTime = time();
 	lastSpawn = time();
 	applyPersistentMapChanges();
@@ -398,7 +441,6 @@ function refreshColliders() {
 	for (let y = 0; y < MAP_H; y++) {
 		for (let x = 0; x < MAP_W; x++) {
 			let id = mget(x, y);
-
 			if (PASSABLE.includes(id)) continue;
 
 			let isAction = INTERACTIVES[id];
@@ -443,7 +485,7 @@ function refreshStructures() {
 }
 
 // ======================================================
-// COLLISIONS
+// OUTILS DIVERS
 // ======================================================
 
 function isTouching(rect1, rect2, padding = 6) {
@@ -453,40 +495,170 @@ function isTouching(rect1, rect2, padding = 6) {
 		rect1.y + 16 - padding > rect2.y;
 }
 
+function isPhaseWorkEnabled() {
+	return phase === PHASE.ETE1 || phase === PHASE.INTERSAISON;
+}
+
+function canRenovateNow() {
+	return phase === PHASE.ETE1 || phase === PHASE.INTERSAISON;
+}
+
+function isRenovatePressed() {
+	return btnp(KEY_B) || keyp(KEYBOARD_X) || key(KEYBOARD_X);
+}
+
+function isWorkPressed() {
+	return btnp(KEY_A) || keyp(KEYBOARD_Z) || key(KEYBOARD_Z);
+}
+
+function showInteraction(msg, color = 12) {
+	interactionMessage = msg;
+	interactionColor = color;
+}
+
+function showEvent(msg, ms = 2500, color = 12) {
+	eventMessage = msg;
+	eventColor = color;
+	eventUntil = time() + ms;
+}
+
+function queuePhaseSwitch(nextPhase, delayMs) {
+	queuedPhase = nextPhase;
+	queuedPhaseAt = time() + delayMs;
+}
+
+function formatOk(flag) {
+	return flag ? 'OK' : 'NON';
+}
+
+function getPhaseRemainingSeconds() {
+	let leftMs = Math.max(0, PHASE_DURATION_MS - (time() - phaseStartTime));
+	return Math.ceil(leftMs / 1000);
+}
+
+function applyEventDamage(amount) {
+	houseHp = Math.max(0, houseHp - amount);
+	if (houseHp <= 0) {
+		triggerGameOver(HOUSE_FAIL_LINES);
+		return true;
+	}
+	return false;
+}
+
+function getRenovationDefenseMultiplier() {
+	// Plus la maison est renovee, plus les degats recus baissent.
+	let reduction = 0;
+	if (renovations.windows) reduction += 0.12;
+	if (renovations.boiler) reduction += 0.08;
+	if (renovations.roof) reduction += 0.17;
+	if (renovations.wall) reduction += 0.23;
+
+	return Math.max(0.35, 1 - reduction);
+}
+
 // ======================================================
-// ACTIONS JOUEUR
+// ACTIONS JOUEUR / RENOVATIONS
 // ======================================================
 
-function repairAll() {
-	// Repare explicitement les 4 fenetres
-	mset(12, 5, 39);
-	mset(16, 5, 39);
-	mset(12, 13, 100);
-	mset(17, 13, 100);
+function payAndRenovate(key) {
+	if (!canRenovateNow()) {
+		showInteraction('Renovations indisponibles pendant cet evenement.', 8);
+		return;
+	}
 
-	windowsRenovated = true;
-	windowsBrokenBySpring = false;
-	nextSpringWindowBreakAt = time() + SPRING_WINDOW_BREAK_DELAY_MS;
+	let def = renovationDefs[key];
+	if (!def) return;
 
-	refreshColliders();
-	refreshStructures();
+	if (renovations[key]) {
+		showInteraction(def.label + ': deja renove.', 11);
+		return;
+	}
+
+	if (player.argent < def.cost) {
+		showInteraction('Pas assez d\'argent pour ' + def.label + '.', 8);
+		return;
+	}
+
+	player.argent -= def.cost;
+	renovations[key] = true;
+	houseHp = Math.min(HOUSE_MAX_HP, houseHp + RENOVATION_HEAL_HP);
+
+	if (key === 'windows') {
+		applyPersistentMapChanges();
+		refreshColliders();
+		refreshStructures();
+	}
+
+	showEvent(def.label + ' renove: -' + def.cost + '$  +10PV maison', 1900, 11);
 }
 
 function doAction(obj) {
 	let item = obj.info;
 	if (!item) return;
 
-	let label = item.cost ? `${item.label} (${item.cost}$)` : item.label;
-	print(label, 60, 125, 12);
+	if (item.type === 'fenetre') {
+		if (renovations.windows) {
+			showInteraction('FENETRES: DEJA RENOVEES', 11);
+		} else {
+			showInteraction('X: RENOVER FENETRES (50$)', 12);
+		}
 
-	if (item.type === 'fenetre' && keyp(KEY_B) && player.argent >= item.cost) {
-		player.argent -= item.cost;
-		repairAll();
+		if (isRenovatePressed()) {
+			payAndRenovate('windows');
+		}
+		return;
+	}
+
+	if (item.type === 'porte') {
+		showInteraction('Porte: passage libre', 6);
 	}
 }
 
+function getNearbyRenovationZoneKey() {
+	let cx = player.x + 8;
+	let cy = player.y + 8;
+
+	for (let key in RENOVATION_ZONES) {
+		let z = RENOVATION_ZONES[key];
+		if (cx >= z.x && cx <= z.x + z.w && cy >= z.y && cy <= z.y + z.h) {
+			return key;
+		}
+	}
+	return null;
+}
+
+function doZoneRenovationAction(zoneKey) {
+	let def = renovationDefs[zoneKey];
+	if (!def) return;
+
+	if (renovations[zoneKey]) {
+		showInteraction(def.label + ': DEJA RENOVE', 11);
+		return;
+	}
+
+	if (!canRenovateNow()) {
+		showInteraction('Renovations indisponibles pendant cette phase', 8);
+		return;
+	}
+
+	showInteraction('X: RENOVER ' + def.label + ' (' + def.cost + '$)', 12);
+
+	if (isRenovatePressed()) {
+		payAndRenovate(zoneKey);
+	}
+}
+
+function tryWorkAction() {
+	if (!isPhaseWorkEnabled() || workCollectedInPhase) return;
+	if (!isWorkPressed()) return;
+
+	player.argent += 100;
+	workCollectedInPhase = true;
+	showEvent('Petits boulots: +100$', 2200, 10);
+}
+
 // ======================================================
-// IA ENNEMIS
+// IA ENNEMIS (pression simple)
 // ======================================================
 
 function getNearestStructure(enemy) {
@@ -515,9 +687,10 @@ function getNearestStructure(enemy) {
 function getEnemyStats(enemy) {
 	let typeData = ENEMY_TYPES[enemy.type];
 	let mods = typeData.seasonMods[season] || { speedMul: 1, damageMul: 1 };
+	let seasonalSprite = SEASON_THREAT_SPRITES[season];
 
 	return {
-		sprite: typeData.sprite,
+		sprite: seasonalSprite !== undefined ? seasonalSprite : typeData.sprite,
 		w: typeData.w,
 		h: typeData.h,
 		speed: typeData.baseSpeed * mods.speedMul,
@@ -564,9 +737,8 @@ function spawnEnemy() {
 
 function trySpawnEnemy() {
 	let settings = SEASON_SETTINGS[season];
-	let elapsedInSeason = time() - seasonStartTime;
+	if (!settings) return;
 
-	if (elapsedInSeason < ENEMY_SPAWN_DELAY_MS) return;
 	if (spawnedBySeason[season] >= settings.maxTotalSpawns) return;
 	if (enemies.length >= settings.maxAlive) return;
 	if (time() - lastSpawn < settings.spawnDelay) return;
@@ -577,8 +749,7 @@ function trySpawnEnemy() {
 }
 
 function updateEnemies() {
-	if (houseHp <= -30 || structures.length === 0) return;
-
+	// En ete, les ennemis sont faibles et secondaires.
 	trySpawnEnemy();
 
 	for (let i = enemies.length - 1; i >= 0; i--) {
@@ -598,22 +769,17 @@ function updateEnemies() {
 			e.x += (dx / dist) * stats.speed;
 			e.y += (dy / dist) * stats.speed;
 		} else {
-			let impact = Math.max(1, Math.floor(stats.damage * target.damageFactor));
+			let baseImpact = Math.max(1, Math.floor(stats.damage * target.damageFactor));
+			if (target.id === HOUSE_TILE_ID) baseImpact = Math.max(baseImpact, HOUSE_HIT_DAMAGE);
 
-			if (target.id === HOUSE_TILE_ID) {
-				impact = Math.max(impact, HOUSE_HIT_DAMAGE);
-			}
+			let defenseMul = getRenovationDefenseMultiplier();
+			let impact = Math.max(1, Math.floor(baseImpact * defenseMul));
 
-			houseHp = houseHp - impact;
-			breakWindowsAtMinus30Once();
+			houseHp = Math.max(0, houseHp - impact);
 			enemies.splice(i, 1);
 		}
 	}
 }
-
-// ======================================================
-// AFFICHAGE
-// ======================================================
 
 function drawEnemies() {
 	for (let i = 0; i < enemies.length; i++) {
@@ -623,65 +789,299 @@ function drawEnemies() {
 	}
 }
 
-function drawHouseHp() {
-	const pct = houseHp / HOUSE_MAX_HP;
+// ======================================================
+// PHASES / EVENEMENTS NARRATIFS
+// ======================================================
 
-	let col = 11;
-	if (pct <= 0.5) col = 9;
-	if (pct <= 0.25) col = 8;
+function beginPhase(newPhase) {
+	phase = newPhase;
+	phaseStartTime = time();
+	seasonStartTime = time();
+	lastSpawn = time();
+	queuedPhase = null;
+	queuedPhaseAt = 0;
 
-	let textX = 2;
-	let textY = 2;
+	if (newPhase === PHASE.ETE1 || newPhase === PHASE.INTERSAISON) {
+		switchToSummer();
+		workCollectedInPhase = false;
+	} else {
+		switchToWinter();
+		workCollectedInPhase = true;
+	}
 
-	let barX = 40;
-	let barY = 2;
-	let barW = 50;
-	let barH = 4;
+	if (newPhase === PHASE.HIVER1) {
+		didWinter1Check = false;
+		showEvent('Mega neige en approche...', 2200, 12);
+	}
 
-	print('MAISON', textX, textY, 0, false, 1);
+	if (newPhase === PHASE.HIVER2) {
+		didWinter2HeatCheck = false;
+		didWinter2BoilerCheck = false;
+		showEvent('Anomalies climatiques detectees.', 2200, 9);
+	}
+}
 
-	rect(barX, barY, barW, barH, 1);
-	rectb(barX, barY, barW, barH, 6);
+function resetRun() {
+	player.x = 117;
+	player.y = 65;
+	player.speed = 1;
+	player.dir = 'bas';
+	player.moving = false;
+	player.argent = 100;
 
-	let w = Math.floor(pct * barW);
-	if (w > 0) rect(barX, barY, w, barH, col);
+	houseHp = HOUSE_MAX_HP;
+	renovations.windows = false;
+	renovations.boiler = false;
+	renovations.roof = false;
+	renovations.wall = false;
 
+	enemies = [];
+	spawnedBySeason.printemps = 0;
+	spawnedBySeason.hiver = 0;
+
+	season = 'printemps';
+	seasonStartTime = 0;
+	winterLoaded = false;
+	winterTransitionQueued = false;
+
+	phase = PHASE.ETE1;
+	phaseStartTime = 0;
+	queuedPhase = null;
+	queuedPhaseAt = 0;
+	didWinter1Check = false;
+	didWinter2HeatCheck = false;
+	didWinter2BoilerCheck = false;
+	workCollectedInPhase = false;
+
+	interactionMessage = '';
+	eventMessage = '';
+	eventUntil = 0;
+	gameOverReasonLines = [];
+	gameOverStartTime = 0;
+
+	switchToSummer();
+	beginPhase(PHASE.ETE1);
+}
+
+function triggerNarrativeEnd(lines) {
+	gameState = 'season_intro';
+	startIntroScreen(lines, function () {
+		resetRun();
+		gameState = 'game';
+	});
+}
+
+function triggerGameOver(lines) {
+	gameOverReasonLines = lines || [];
+	gameOverStartTime = time();
+	gameState = 'game_over';
+}
+
+function triggerVictory() {
+	triggerNarrativeEnd(VICTORY_LINES);
+}
+
+function runQueuedPhaseIfNeeded() {
+	if (!queuedPhase) return;
+	if (time() < queuedPhaseAt) return;
+
+	let next = queuedPhase;
+	queuedPhase = null;
+
+	if (next === PHASE.INTERSAISON) {
+		gameState = 'season_intro';
+		startIntroScreen(INTERSEASON_LINES, function () {
+			beginPhase(PHASE.INTERSAISON);
+			gameState = 'game';
+		});
+		return;
+	}
+
+	if (next === PHASE.HIVER1) {
+		gameState = 'season_intro';
+		startIntroScreen(WINTER1_LINES, function () {
+			beginPhase(PHASE.HIVER1);
+			gameState = 'game';
+		});
+		return;
+	}
+
+	if (next === PHASE.HIVER2) {
+		gameState = 'season_intro';
+		startIntroScreen(WINTER2_LINES, function () {
+			beginPhase(PHASE.HIVER2);
+			gameState = 'game';
+		});
+	}
+}
+
+function updatePhaseLogic() {
+	runQueuedPhaseIfNeeded();
+	if (gameState !== 'game') return;
+
+	// Maison detruite par la pression ennemie -> echec simple.
 	if (houseHp <= 0) {
-		print('GAME OVER', 92, 62, 8, false, 2);
+		triggerGameOver(HOUSE_FAIL_LINES);
+		return;
+	}
+
+	let elapsed = time() - phaseStartTime;
+
+	if (phase === PHASE.ETE1) {
+		if (elapsed >= PHASE_DURATION_MS) {
+			queuePhaseSwitch(PHASE.HIVER1, 0);
+		}
+		return;
+	}
+
+	if (phase === PHASE.HIVER1) {
+		if (!didWinter1Check && elapsed >= WINTER1_CHECK_DELAY_MS) {
+			didWinter1Check = true;
+
+			if (!renovations.roof) {
+				triggerGameOver(WINTER1_FAIL_LINES);
+				return;
+			}
+
+			if (applyEventDamage(WINTER1_EVENT_DAMAGE)) return;
+			player.argent += 50;
+			showEvent('Toit OK mais tempete forte: -' + WINTER1_EVENT_DAMAGE + ' PV, bonus +50$', 2800, 11);
+			queuePhaseSwitch(PHASE.INTERSAISON, 0);
+		}
+		return;
+	}
+
+	if (phase === PHASE.INTERSAISON) {
+		if (elapsed >= PHASE_DURATION_MS) {
+			queuePhaseSwitch(PHASE.HIVER2, 0);
+		}
+		return;
+	}
+
+	if (phase === PHASE.HIVER2) {
+		if (!didWinter2HeatCheck && elapsed >= WINTER2_HEAT_DELAY_MS) {
+			didWinter2HeatCheck = true;
+			const wellIsolated = renovations.wall && renovations.windows;
+
+			if (!wellIsolated) {
+				triggerGameOver(HEAT_FAIL_LINES);
+				return;
+			}
+
+			if (applyEventDamage(WINTER2_HEAT_EVENT_DAMAGE)) return;
+			showEvent('Event chaleur: maison affaiblie -' + WINTER2_HEAT_EVENT_DAMAGE + ' PV.', 2400, 10);
+		}
+
+		if (didWinter2HeatCheck && !didWinter2BoilerCheck && elapsed >= WINTER2_BOILER_DELAY_MS) {
+			didWinter2BoilerCheck = true;
+
+			if (!renovations.boiler) {
+				triggerGameOver(BOILER_FAIL_LINES);
+				return;
+			}
+
+			if (applyEventDamage(WINTER2_BOILER_EVENT_DAMAGE)) return;
+			showEvent('Event chaudiere: pression froide -' + WINTER2_BOILER_EVENT_DAMAGE + ' PV.', 2200, 11);
+		}
+
+		if (didWinter2HeatCheck && didWinter2BoilerCheck && elapsed >= PHASE_DURATION_MS) {
+			triggerVictory();
+		}
 	}
 }
 
 // ======================================================
-// HUD JOUEUR
+// RENDU
 // ======================================================
 
-function handleHealthInput() {
-	const btnZ = btn(KEY_A);
-	const btnX = btn(KEY_B);
+function drawWeatherOverlay() {
+	if (phase !== PHASE.HIVER1 && phase !== PHASE.HIVER2) return;
 
-	if (btnZ && !prevBtn.z) {
-		hp = Math.max(0, hp - 10);
+	// Petits flocons pour rendre la saison lisible en demo.
+	for (let i = 0; i < 16; i++) {
+		let sx = (time() / 8 + i * 15) % 240;
+		let sy = (time() / 10 + i * 21) % 136;
+		pix(Math.floor(sx), Math.floor(sy), 12);
 	}
+}
 
-	if (btnX && !prevBtn.x) {
-		const oldHp = hp;
-		hp = Math.min(MAX_HP, hp + 10);
+function drawRenovationZones() {
+	// Marqueurs en sprites 8x8.
+	for (let key in RENOVATION_ZONES) {
+		let z = RENOVATION_ZONES[key];
+		let icon = RENOVATION_ZONE_ICONS[key] || 31;
+		if (icon <= 0) continue;
+		let ix = z.x + Math.floor(z.w / 2) - 4;
+		let iy = z.y + Math.floor(z.h / 2) - 4;
+		spr(icon, ix, iy, 0, 1);
+	}
+}
 
-		if (oldHp < MAX_HP && hp === MAX_HP) {
-			fullHpUntil = time() + 3000;
+function drawHouseDamageBar() {
+	const pct = Math.max(0, Math.min(1, houseHp / HOUSE_MAX_HP));
+
+	// Grande jauge horizontale sous la ligne de stats.
+	const x = 2;
+	const y = 10;
+	const w = 236;
+	const h = 7;
+
+	let col = 11; // vert
+	if (pct <= 0.66) col = 9; // orange
+	if (pct <= 0.33) col = 8; // rouge
+
+	rect(x, y, w, h, 1);
+	rectb(x - 1, y - 1, w + 2, h + 2, 0);
+
+	let fillW = Math.floor((w - 2) * pct);
+	if (fillW > 0) {
+		rect(x + 1, y + 1, fillW, h - 2, col);
+	}
+}
+
+function drawTopHud() {
+	// Ligne d'infos en haut
+	rect(0, 0, 240, 8, 0);
+	print('$' + player.argent, 2, 1, 12);
+	print(PHASE_LABELS[phase], 78, 1, 12);
+	print('T:' + getPhaseRemainingSeconds(), 150, 1, 10);
+	print('M:' + Math.floor(houseHp), 202, 1, 12);
+
+	drawHouseDamageBar();
+}
+
+function drawRenovationHud() {
+	rect(0, 120, 240, 8, 0);
+	print('F:' + formatOk(renovations.windows), 2, 121, renovations.windows ? 11 : 8);
+	print('C:' + formatOk(renovations.boiler), 58, 121, renovations.boiler ? 11 : 8);
+	print('T:' + formatOk(renovations.roof), 114, 121, renovations.roof ? 11 : 8);
+	print('M:' + formatOk(renovations.wall), 170, 121, renovations.wall ? 11 : 8);
+}
+
+function drawMessageBar() {
+	rect(0, 128, 240, 8, 0);
+
+	let msg = '';
+	let col = 6;
+
+	if (eventMessage && time() < eventUntil) {
+		msg = eventMessage;
+		col = eventColor;
+	} else {
+		if (time() >= eventUntil) eventMessage = '';
+
+		if (interactionMessage) {
+			msg = interactionMessage;
+			col = interactionColor;
+		} else if (phase === PHASE.ETE1 || phase === PHASE.INTERSAISON) {
+			msg = workCollectedInPhase ? 'X:renover' : 'Z:+100$  X:renover';
+		} else {
+			msg = 'Survis aux evenements climatiques';
 		}
 	}
 
-	prevBtn.z = btnZ;
-	prevBtn.x = btnX;
+	print(msg, 2, 129, col);
 }
-
-// ======================================================
-// INIT
-// ======================================================
-
-refreshColliders();
-refreshStructures();
 
 // ======================================================
 // BOUCLE PRINCIPALE
@@ -692,45 +1092,29 @@ function TIC() {
 		drawIntro();
 		return;
 	}
-
-	if (seasonStartTime === 0) {
-		seasonStartTime = time();
-		lastSpawn = time();
-		nextSpringWindowBreakAt = time() + SPRING_WINDOW_BREAK_DELAY_MS;
-	}
-
-	// Changement saison manuel (garde la fonctionnalite de la version intro)
-	if (!winterLoaded && !winterTransitionQueued && btnp(7)) {
-		winterTransitionQueued = true;
-		gameState = 'season_intro';
-		startIntroScreen(WINTER_LINES, function () {
-			switchToWinter();
-			gameState = 'game';
-			winterTransitionQueued = false;
-		});
+	if (gameState === 'game_over') {
+		drawGameOverScreen();
 		return;
 	}
 
-	// Changement saison automatique (garde la fonctionnalite de la clean version)
-	if (!winterLoaded && !winterTransitionQueued && time() - seasonStartTime >= SEASON_DURATION_MS) {
-		winterTransitionQueued = true;
-		gameState = 'season_intro';
-		startIntroScreen(WINTER_LINES, function () {
-			switchToWinter();
-			gameState = 'game';
-			winterTransitionQueued = false;
-		});
-		return;
-	}
+	interactionMessage = '';
+	interactionColor = 12;
 
-	handleSpringWindowEvent();
+	updatePhaseLogic();
+	if (gameState !== 'game') return;
+
 	updateEnemies();
 
 	cls();
 	map(0, 0, MAP_W, MAP_H, 0, 0);
+	drawRenovationZones();
 	drawEnemies();
+	drawWeatherOverlay();
 
+	// --------------------------------------------------
 	// MOUVEMENT JOUEUR
+	// --------------------------------------------------
+
 	let dx = 0;
 	let dy = 0;
 
@@ -751,9 +1135,12 @@ function TIC() {
 		player.dir = 'droite';
 	}
 
-	player.moving = (dx !== 0 || dy !== 0);
+	player.moving = dx !== 0 || dy !== 0;
 
-	// COLLISIONS JOUEUR
+	// --------------------------------------------------
+	// COLLISIONS
+	// --------------------------------------------------
+
 	let nextX = { x: player.x + dx, y: player.y };
 	let nextY = { x: player.x, y: player.y + dy };
 	let hitX = false;
@@ -773,9 +1160,11 @@ function TIC() {
 	if (!hitX) player.x += dx;
 	if (!hitY) player.y += dy;
 
-	// SPRITE JOUEUR
-	let anim = (Math.floor(time() / 150) % 2 === 0);
+	// --------------------------------------------------
+	// SPRITE JOUEUR (IDs demandes conserves)
+	// --------------------------------------------------
 
+	let anim = Math.floor(time() / 150) % 2 === 0;
 	const sprites = {
 		bas: player.moving ? (anim ? 257 : 259) : 259,
 		haut: player.moving ? (anim ? 323 : 325) : 327,
@@ -785,23 +1174,36 @@ function TIC() {
 
 	spr(sprites[player.dir], player.x, player.y, 0, 1, 0, 0, 2, 2);
 
+	// --------------------------------------------------
 	// INTERACTIONS
-	if (activeObj) doAction(activeObj);
+	// --------------------------------------------------
 
+	let zoneKey = getNearbyRenovationZoneKey();
+	if (zoneKey) {
+		doZoneRenovationAction(zoneKey);
+	} else if (activeObj) {
+		doAction(activeObj);
+	}
+
+	if (!zoneKey && !activeObj && isPhaseWorkEnabled() && !workCollectedInPhase) {
+		showInteraction('Z: PETITS BOULOTS (+100$)', 10);
+	}
+
+	tryWorkAction();
+
+	// --------------------------------------------------
 	// HUD
-	handleHealthInput();
-	drawHouseHp();
+	// --------------------------------------------------
 
-	let remainingSeason = Math.max(0, Math.ceil((SEASON_DURATION_MS - (time() - seasonStartTime)) / 1000));
-	let remainingSpawnDelay = Math.max(0, Math.ceil((ENEMY_SPAWN_DELAY_MS - (time() - seasonStartTime)) / 1000));
-
-	print('ARGENT: ' + player.argent + '$', 170, 2, 0);
-
-	if (!winterLoaded) {
-		print('HIVER DANS ' + remainingSeason + 's', 95, 10, 0);
-	}
-
-	if (remainingSpawnDelay > 0) {
-		print('ENNEMIS DANS ' + remainingSpawnDelay + 's', 80, 118, 0);
-	}
+	drawTopHud();
+	drawRenovationHud();
+	drawMessageBar();
 }
+
+// ======================================================
+// INIT
+// ======================================================
+
+refreshColliders();
+refreshStructures();
+resetRun();
