@@ -1,6 +1,6 @@
 param(
-    [string]$Tic80Exe = "C:\Users\banan\Desktop\tic80.exe",
-    [string]$ProjectDir = "D:\TIC80-JeuRenov"
+    [string]$Tic80Exe = "C:\Users\Maxime\Downloads\tic80.exe",
+    [string]$ProjectDir = "C:\Users\Maxime\Documents\TIC80-JeuRenov"
 )
 
 $ErrorActionPreference = "Stop"
